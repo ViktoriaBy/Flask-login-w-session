@@ -28,9 +28,12 @@ app.secret_key = '34efdr345g'
 # ALWAYS CHECKS SESSION AND IF IT EXSIST PUT USER INFO INTO G OBJECT
 @app.before_request
 def before_request():
+    g.user = None
+    
     if 'user_id' in session:
         user = [x for x in users if x.id == session['user_id']][0]
         g.user = user
+        
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -45,8 +48,7 @@ def login():
             session['user_id'] = user.id
             return redirect(url_for('profile'))
         
-        return redirect(url_for('login'))
-            
+        
     
     return render_template("login.html")
 
@@ -54,8 +56,10 @@ def login():
 
 @app.route('/profile')
 def profile():
+    if not g.user:
+        return redirect(url_for('login'))
+            
     return render_template("profile.html")
-
 
 
 
